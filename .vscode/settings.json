@@ -23,8 +23,6 @@
         "chrono": "cpp",
         "format": "cpp",
         "stacktrace": "cpp",
-        "thread": "cpp",
-        "initializer_list": "cpp",
-        "text_encoding": "cpp"
+        "thread": "cpp"
     }
 }
