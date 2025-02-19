@@ -8,9 +8,11 @@ int main()
 {
     ifstream infile("opdr1.txt");
     string word, currentWord;
+    // set word to the first line since that is the word to check against
     getline(infile, word);
     int charactersInWord[26] = {0};
-    for (char character : word) // count characters in the correct word
+    // count characters in the correct word
+    for (char character : word) 
     {
         charactersInWord[character - 'a']++;
     }
@@ -19,6 +21,7 @@ int main()
     int uniqueGoodWordCount = 0;
     int duplicateWordCount = 0;
     int badWordCount = 0;
+    // read every other words and check them
     while (getline(infile, currentWord))
     {
         if (currentWord == "STOP")
@@ -60,10 +63,10 @@ int main()
     }
     // if a word is not duplicated and is not a bad word it must be correct and unique
     uniqueGoodWordCount = wordCount - duplicateWordCount - badWordCount;
-    cout << "Total words: " << wordCount << endl;
-    cout << "Unique good words: " << uniqueGoodWordCount << endl;
-    cout << "Same words: " << duplicateWordCount << endl;
-    cout << "Bad words: " << badWordCount << endl;
+    cout << wordCount << endl; //Total words
+    cout << uniqueGoodWordCount << endl; //Unique good words
+    cout << duplicateWordCount << endl; //Same words
+    cout << badWordCount << endl; //Bad words
     infile.close();
     return 0;
 }
