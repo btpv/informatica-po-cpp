@@ -1,0 +1,7 @@
+- [x] opdr 1 | borro
+- [ ] opdr 2 | 
+- [ ] opdr 3 | simon
+- [ ] opdr 4 | lenny
+- [ ] opdr 5 | simon
+- [ ] opdr 6 | borro
+- [ ] opdr 7 |
