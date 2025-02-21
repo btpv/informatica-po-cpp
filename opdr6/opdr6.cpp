@@ -11,16 +11,41 @@ white        37         47
 */
 #include <iostream>
 #include <algorithm>
+#include <unistd.h>
 using namespace std;
 const string reset = "\033[0m";
-const string items[16] = { "cheese","cucumber","salad","melon","bread","milk","chips","cookies","pork","ham","tomatoes","potatoes","carrots","pizza","idk","f you" };
+const string items[16] = { "cheese","cucumber","salad","melon","bread","milk","chips","cookies","pork","ham","tomatoes","potatoes","carrots","pizza","banana","somthing" };
 int itemPositions[16] = { 4,5,7,8,18,19,21,22,35,36,38,39,46,47,49,50 };
 bool basket[4][16] = { {false} };
 int basketPositions[4] = { 6,20,37,48 };
 const string playercolors[4] = { "\033[31m","\033[32m","\033[33m","\033[34m" };
 int playerPositions[4] = { 0 };
 int players;
-void drawboard() {
+int turn =0;
+int turnStep = 0;
+
+string setLength(string str, int length) {
+    if (str.length() < length) {
+        return str + string(length - str.length(), ' ');
+    } else {
+        return str.substr(0, length);
+    }
+}
+string setLength(int num, int length) {
+    return setLength(to_string(num), length);
+}
+bool isInputAvailable() {
+    fd_set fds;
+    struct timeval timeout = {0, 0}; // No wait time
+
+    FD_ZERO(&fds);
+    FD_SET(STDIN_FILENO, &fds);
+
+    return select(STDIN_FILENO + 1, &fds, nullptr, nullptr, &timeout) > 0;
+}
+void drawboard(int turn) {
+    string board = "";
+    board += "\033[s";
     // draw a grid of numbers 
     int lastPlayerBasketIndex[4] = { 0 };
     for (int i = 0; i < 8; i++) {
@@ -39,29 +64,36 @@ void drawboard() {
             } else if (find(basketPositions, basketPositions + 4, currentPosition) != basketPositions + 4) {
                 backgroundColor = "\033[46m";
             }
-            cout << backgroundColor << forgroundColor << "|" << ((i * 8 + j + 1) < 10 ? " " : "") << currentPosition << "|" << reset << "  ";
+            board += backgroundColor + forgroundColor + "|" + ((i * 8 + j + 1) < 10 ? " " : "") + to_string(currentPosition) + "|" + reset + "  ";
         }
         switch (i) {
         case 0:
             for (int j = 0; j < players; j++) {
-                cout << playercolors[j] << "player " << j + 1 << " (" << playerPositions[j] << ")\t";
+                board += playercolors[j] + "player " + to_string(j + 1) + " (" + to_string(playerPositions[j]) + ")\t" + reset;
             }
             break;
         default:
             for (int j = 0; j < players; j++) {
                 string item = "";
+                int position = 0;
                 for (int k = lastPlayerBasketIndex[j]; k < 16; k++) {
                     if (basket[j][k]) {
-                        lastPlayerBasketIndex[j] = k+1;
+                        lastPlayerBasketIndex[j] = k + 1;
                         item = items[k];
+                        position = itemPositions[k];
                         break;
                     }
                 }
-                cout << playercolors[j] << item + string(16-item.length(),' ');
+                board += playercolors[j] + setLength(item, 9);
+                if (position > 0) {
+                    board += "(" + setLength(position, 2) + ")";
+                }
+                board += "\t" + reset;
             }
         }
-        cout << endl;
+        board += "\n";
     }
+    cout << board + "\033[u";
 }
 int main() {
     srand(time(0));
@@ -93,7 +125,12 @@ int main() {
         playerPositions[i] = rand() % 64;
         cout << playerPositions[i] << endl;
     }
-    drawboard();
+    while (true) {
+        drawboard(turn&players);
+        // isInputAvailable()
+        // wait a second
+        sleep(1 / 5);
+    }
 
     return 0;
 }
