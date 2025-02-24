@@ -20,6 +20,7 @@ const string items[16] = { "cheese","cucumber","salad","melon","bread","milk","c
 int itemPositions[16] = { 4,5,7,8,18,19,21,22,35,36,38,39,46,47,49,50 };
 bool basket[4][16] = { {false} };
 int basketPositions[4] = { 6,20,37,48 };
+int forgetPositions[3] = {13,26,41};
 const string playercolors[4] = { "\033[31m","\033[32m","\033[33m","\033[34m" };
 int playerPositions[4] = { 0 };
 int players;
@@ -164,6 +165,17 @@ int main() {
                     basket[turn % players][i] = false;
                 }
             }
+            for (int basketPosition : basketPositions){
+                if (playerPositions[turn % players] == basketPosition){
+                    turn--;
+                }
+            }
+            for (int forgetPosition : forgetPositions){
+                if (playerPositions[turn % players] == forgetPosition){
+                    playerPositions[turn % players] -= 4;
+                }
+            }
+
             turnStep++;
         }
         if (turnStep > 2) {
