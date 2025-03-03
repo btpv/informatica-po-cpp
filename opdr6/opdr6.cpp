@@ -27,6 +27,7 @@ int playerPositions[4] = { 0 };
 int players;
 int turn = 0;
 int turnStep = 0;
+string message = "";
 
 string setLength(string str, int length) {
     if (str.length() < length) {
@@ -40,7 +41,7 @@ string setLength(int num, int length) {
 }
 bool isInputAvailable() {
     fd_set fds;
-    struct timeval timeout = { 0, 0 }; // No wait time
+    struct timeval timeout = { 0, 0 };
 
     FD_ZERO(&fds);
     FD_SET(STDIN_FILENO, &fds);
@@ -56,7 +57,7 @@ void drawboard(int turn, int turnStep) {
     board += "\033[s";
     // draw a grid of numbers 
     if (turnStep == 0) {
-        diceRoll = chrono::duration_cast<std::chrono::nanoseconds>(chrono::high_resolution_clock::now().time_since_epoch()).count() % 6 + 1;
+        diceRoll = (chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now().time_since_epoch()).count() / 100) % 6 + 1;
     }
     int lastPlayerBasketIndex[4] = { 0 };
     for (int i = 0; i < 8; i++) {
@@ -155,7 +156,7 @@ int main() {
         return 1;
     }
     while (true) {
-        auto start = std::chrono::high_resolution_clock::now();
+        auto start = chrono::high_resolution_clock::now();
         drawboard(turn % players, turnStep);
         if (isInputAvailable()) {
             string input;
@@ -203,11 +204,11 @@ int main() {
             }
             turn++;
         }
-        auto end = std::chrono::high_resolution_clock::now();
-        auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+        auto end = chrono::high_resolution_clock::now();
+        auto elapsed = chrono::duration_cast<chrono::milliseconds>(end - start).count();
         auto remaining_time = 100 - elapsed;
         if (remaining_time > 0) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(remaining_time));
+            this_thread::sleep_for(chrono::milliseconds(remaining_time));
         }
     }
 
