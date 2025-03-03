@@ -1,4 +1,5 @@
 /*
+https://en.wikipedia.org/wiki/ANSI_escape_code
          foreground background
 black        30         40
 red          31         41
