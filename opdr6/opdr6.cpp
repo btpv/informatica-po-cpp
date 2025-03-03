@@ -16,12 +16,12 @@ white        37         47
 #include <thread>
 using namespace std;
 const string reset = "\033[0m";
-const string items[16] = { "cheese","cucumber","salad","melon","bread","milk","chips","cookies","pork","ham","tomatoes","potatoes","carrots","pizza","banana","paprika" };
-int itemPositions[16] = { 4,5,7,8,18,19,21,22,35,36,38,39,46,47,49,50 };
-bool basket[4][16] = { {false} };
-int basketPositions[4] = { 6,20,37,48 };
-int forgetPositions[3] = {13,26,41};
 const string playercolors[4] = { "\033[31m","\033[32m","\033[33m","\033[34m" };
+const string items[16] = { "cheese","cucumber","salad","melon","bread","milk","chips","cookies","pork","ham","tomatoes","potatoes","carrots","pizza","banana","paprika" };
+const int itemPositions[16] = { 4,5,7,8,18,19,21,22,35,36,38,39,46,47,49,50 };
+const int basketPositions[4] = { 6,20,37,48 };
+const int forgetPositions[3] = { 13,26,41 };
+bool basket[4][16] = { {false} };
 int playerPositions[4] = { 0 };
 int players;
 int turn = 0;
@@ -71,16 +71,19 @@ void drawboard(int turn, int turnStep) {
                 }
             }
             if (find(itemPositions, itemPositions + 16, currentPosition) != itemPositions + 16) {
-                backgroundColor = "\033[105m";
+                backgroundColor = "\033[2m";
             } else if (find(basketPositions, basketPositions + 4, currentPosition) != basketPositions + 4) {
-                backgroundColor = "\033[106m";
+                backgroundColor = "\033[7m";
+            } else if (find(forgetPositions, forgetPositions + 3, currentPosition) != forgetPositions + 3) {
+                backgroundColor = "\033[4m";
             }
+
             board += backgroundColor + forgroundColor + "|" + ((i * 8 + j + 1) < 10 ? " " : "") + to_string(currentPosition) + "|" + reset + "  ";
         }
         // draw the shopping lists
         if (i == 0) {
             for (int j = 0; j < players; j++) {
-                board += playercolors[j] + "player " + to_string(j + 1) + " (" + to_string(playerPositions[j]) + ")\t" + reset;
+                board += playercolors[j] + "player " + to_string(j + 1) + " (" + setLength(playerPositions[j], 2) + ")\t" + reset;
             }
         } else {
             for (int j = 0; j < players; j++) {
@@ -97,8 +100,8 @@ void drawboard(int turn, int turnStep) {
                 board += playercolors[j] + setLength(item, 9);
                 if (position > 0) {
                     board += "(" + setLength(position, 2) + ")";
-                } else{
-                    board += string(4,' ');
+                } else {
+                    board += string(4, ' ');
                 }
                 board += "\t" + reset;
             }
@@ -112,11 +115,24 @@ void drawboard(int turn, int turnStep) {
                 board += block(diceRoll > 5) + string(3, ' ') + block(diceRoll & 1) + string(3, ' ') + block(diceRoll > 5);
             } else if (i > 5) {
                 board += block(diceRoll > 3) + string(10, ' ') + block(diceRoll > 1);
+            } else {
+                board += string(18, ' ');
             }
+        }
+        switch (i) {
+        case 0:
+            board += reset + "\t" + "\033[2m" + "shopping item";
+            break;
+        case 1:
+            board += reset + "\t" + "\033[7m" + "trow again";
+            break;
+        case 2:
+            board += reset + "\t" + "\033[4m" + "forget something go back 4 steps";
+            break;
         }
         board += reset + "\n";
     }
-    //get nano seconds and calculate the draw time
+    //go back to the beginning
     cout << board + "\033[u";
     return;
 }
@@ -146,32 +162,32 @@ int main() {
             turnStep++;
         }
         if (turnStep == 1) {
-            diceRoll = rand() % 6 +1;
+            diceRoll = rand() % 6 + 1;
             drawboard(turn % players, turnStep);
             sleep(1);
             turnStep++;
         }
         if (turnStep == 2) {
             playerPositions[turn % players] += diceRoll;
-            for (int i = 0; i < players; i++){
-                if (turn % players != i){
-                    if (playerPositions[i] == playerPositions[turn % players]){
+            for (int i = 0; i < players; i++) {
+                if (turn % players != i) {
+                    if (playerPositions[i] == playerPositions[turn % players]) {
                         playerPositions[i] = 0;
                     }
                 }
             }
-            for (int i = 0; i <16; i++){
-                if (basket[turn % players][i] && playerPositions[turn % players] == itemPositions[i]){
+            for (int i = 0; i < 16; i++) {
+                if (basket[turn % players][i] && playerPositions[turn % players] == itemPositions[i]) {
                     basket[turn % players][i] = false;
                 }
             }
-            for (int basketPosition : basketPositions){
-                if (playerPositions[turn % players] == basketPosition){
+            for (int basketPosition : basketPositions) {
+                if (playerPositions[turn % players] == basketPosition) {
                     turn--;
                 }
             }
-            for (int forgetPosition : forgetPositions){
-                if (playerPositions[turn % players] == forgetPosition){
+            for (int forgetPosition : forgetPositions) {
+                if (playerPositions[turn % players] == forgetPosition) {
                     playerPositions[turn % players] -= 4;
                 }
             }
@@ -180,7 +196,7 @@ int main() {
         }
         if (turnStep > 2) {
             turnStep = 0;
-            while (isInputAvailable()){
+            while (isInputAvailable()) {
                 string input;
                 getline(cin, input);
             }
