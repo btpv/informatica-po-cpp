@@ -2,6 +2,6 @@
 - [ ] opdr 2 | Lenny
 - [x] opdr 3 | simon
 - [x] opdr 4 | lenny
-- [ ] opdr 5 | simon
+- [x] opdr 5 | simon
 - [ ] opdr 6 | borro
 - [ ] opdr 7 | 
