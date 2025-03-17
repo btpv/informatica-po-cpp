@@ -10,7 +10,9 @@ int main() {
   vector<string> stenen;
   ifstream file1("orde.in");
   while (getline(file1, steen)) {
-    stenen.push_back(steen);
+    if (!steen.empty()) {
+      stenen.push_back(steen);
+    }
   }
 
   int aantal_zetten = 0;
