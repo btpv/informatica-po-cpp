@@ -68,12 +68,11 @@ int main() {
     }
   }
 
-  int correct_letters = 0;
-  bool wrong_letter = false;
   vector<string> remaining_words;
-
   // checks for the remaning possible words
   for (string word : words) {
+    bool wrong_letter = false;
+    int correct_letters = 0;
     for (char letter : letters_in_secret_word) {
       if (word.find(letter) != string::npos) {
         correct_letters++;
@@ -82,26 +81,19 @@ int main() {
     for (char letter : letters_not_in_secret_word) {
       if (word.find(letter) != string::npos) {
         wrong_letter = true;
+        break;
       }
     }
-    if (correct_letter_wrong_position.empty()) {
-      if (correct_letters == letters_in_secret_word.size() &&
-          wrong_letter == false) {
-        remaining_words.push_back(word);
-      }
-    } else {
-      for (int i = 0; i < correct_letter_wrong_position.size(); i++) {
-        if (word[correct_letter_wrong_position_index[i]] !=
-            correct_letter_wrong_position[i]) {
-          if (correct_letters == letters_in_secret_word.size() &&
-              wrong_letter == false) {
-            remaining_words.push_back(word);
-          }
-        }
+    for (int i = 0; i < correct_letter_wrong_position.size(); i++) {
+      if (word[correct_letter_wrong_position_index[i]] ==
+          correct_letter_wrong_position[i]) {
+        wrong_letter = true;
+        break;
       }
     }
-    correct_letters = 0;
-    wrong_letter = false;
+    if (!wrong_letter && correct_letters == letters_in_secret_word.size()) {
+      remaining_words.push_back(word);
+    }
   }
 
   cout << remaining_words.size() << endl;
