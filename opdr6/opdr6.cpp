@@ -22,8 +22,11 @@ const string items[16] = { "cheese","cucumber","salad","melon","bread","milk","c
 const int itemPositions[16] = { 4,5,7,8,18,19,21,22,35,36,38,39,46,47,49,50 };
 const int basketPositions[4] = { 6,20,37,48 };
 const int forgetPositions[3] = { 13,26,41 };
+//TODO make it work
+const int thingPositions[2][3] = { {16,17,55},{32,42,42}};
 bool basket[4][16] = { {false} };
 int playerPositions[4] = { 0 };
+int playerWait[4] = { 0 };
 int players;
 int turn = 0;
 int turnStep = 0;
@@ -78,6 +81,10 @@ void drawboard(int turn, int turnStep) {
                 backgroundColor = "\033[7m";
             } else if (find(forgetPositions, forgetPositions + 3, currentPosition) != forgetPositions + 3) {
                 backgroundColor = "\033[4m";
+            } else if (currentPosition == 32) {
+                backgroundColor = "\033[1;3;7m";
+            } else if (currentPosition == 59) {
+                backgroundColor = "\033[1;7m";
             }
 
             board += backgroundColor + forgroundColor + "|" + ((i * 8 + j + 1) < 10 ? " " : "") + to_string(currentPosition) + "|" + reset + "  ";
@@ -131,6 +138,15 @@ void drawboard(int turn, int turnStep) {
         case 2:
             board += reset + "\t" + "\033[4m" + "forget something go back 4 steps";
             break;
+        case 3:
+            board += reset + "\t" + "\033[1;3;7m" + "wait 2 turns";
+            break;
+        case 4:
+            board += reset + "\t" + "\033[1;7m" + "start over";
+            break;
+        case 5:
+            board += reset + "\t" + "\033[1;3m" + "chose to move";
+            break;
         }
         board += reset + "\n";
     }
@@ -171,6 +187,14 @@ int main() {
         }
         if (turnStep == 2) {
             playerPositions[turn % players] += diceRoll;
+            for (int forgetPosition : forgetPositions) {
+                if (playerPositions[turn % players] == forgetPosition) {
+                    playerPositions[turn % players] -= 4;
+                }
+            }
+            if (playerPositions[turn % players] == 59) {
+                playerPositions[turn % players] = 0;
+            }
             for (int i = 0; i < players; i++) {
                 if (turn % players != i) {
                     if (playerPositions[i] == playerPositions[turn % players]) {
@@ -188,10 +212,8 @@ int main() {
                     turn--;
                 }
             }
-            for (int forgetPosition : forgetPositions) {
-                if (playerPositions[turn % players] == forgetPosition) {
-                    playerPositions[turn % players] -= 4;
-                }
+            if (playerPositions[turn % players] == 32) {
+                playerWait[turn % players] += 2;
             }
 
             turnStep++;
@@ -203,6 +225,10 @@ int main() {
                 getline(cin, input);
             }
             turn++;
+            if (playerWait[turn % players] > 0) {
+                playerWait[turn % players]--;
+                turn++;
+            }
         }
         auto end = chrono::high_resolution_clock::now();
         auto elapsed = chrono::duration_cast<chrono::milliseconds>(end - start).count();
