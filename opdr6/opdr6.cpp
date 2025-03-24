@@ -1,14 +1,5 @@
 /*
 https://en.wikipedia.org/wiki/ANSI_escape_code
-         foreground background
-black        30         40
-red          31         41
-green        32         42
-yellow       33         43
-blue         34         44
-magenta      35         45
-cyan         36         46
-white        37         47
 */
 #include <iostream>
 #include <algorithm>
@@ -22,15 +13,15 @@ const string items[16] = { "cheese","cucumber","salad","melon","bread","milk","c
 const int itemPositions[16] = { 4,5,7,8,18,19,21,22,35,36,38,39,46,47,49,50 };
 const int basketPositions[4] = { 6,20,37,48 };
 const int forgetPositions[3] = { 13,26,41 };
-//TODO make it work
-const int thingPositions[2][3] = { {16,17,55},{32,42,42}};
+//TODO: make it work
+const int thingPositions[2][3] = { {16,17,55},{32,42,-1} };
 bool basket[4][16] = { {false} };
 int playerPositions[4] = { 0 };
 int playerWait[4] = { 0 };
 int players;
 int turn = 0;
 int turnStep = 0;
-string message = "";
+string infoline = "";
 
 string setLength(string str, int length) {
     if (str.length() < length) {
@@ -56,8 +47,8 @@ string block(bool draw) {
 }
 int diceRoll = 0;
 void drawboard(int turn, int turnStep) {
-    string board = "";
-    board += "\033[s";
+    string board = "\033[s\033[0J";
+
     // draw a grid of numbers 
     if (turnStep == 0) {
         diceRoll = (chrono::duration_cast<chrono::milliseconds>(chrono::high_resolution_clock::now().time_since_epoch()).count() / 100) % 6 + 1;
@@ -116,18 +107,18 @@ void drawboard(int turn, int turnStep) {
             }
         }
         // draw the dice
-        if (turnStep == 0 || turnStep == 1) {
-            board += playercolors[turn];
-            if (i < 2) {
-                board += block(diceRoll > 1) + string(10, ' ') + block(diceRoll > 3);
-            } else if (i > 2 && i < 5) {
-                board += block(diceRoll > 5) + string(3, ' ') + block(diceRoll & 1) + string(3, ' ') + block(diceRoll > 5);
-            } else if (i > 5) {
-                board += block(diceRoll > 3) + string(10, ' ') + block(diceRoll > 1);
-            } else {
-                board += string(18, ' ');
-            }
+        // if (turnStep == 0 || turnStep == 1) {
+        board += playercolors[turn];
+        if (i < 2) {
+            board += block(diceRoll > 1) + string(10, ' ') + block(diceRoll > 3);
+        } else if (i > 2 && i < 5) {
+            board += block(diceRoll > 5) + string(3, ' ') + block(diceRoll & 1) + string(3, ' ') + block(diceRoll > 5);
+        } else if (i > 5) {
+            board += block(diceRoll > 3) + string(10, ' ') + block(diceRoll > 1);
+        } else {
+            board += string(18, ' ');
         }
+        // }
         switch (i) {
         case 0:
             board += reset + "\t" + "\033[2m" + "shopping item";
@@ -147,7 +138,10 @@ void drawboard(int turn, int turnStep) {
         case 5:
             board += reset + "\t" + "\033[1;3m" + "chose to move";
             break;
+        case 7:
+            board += reset + "\t" + setLength(infoline, 64);
         }
+
         board += reset + "\n";
     }
     //go back to the beginning
@@ -185,7 +179,7 @@ int main() {
             sleep(1);
             turnStep++;
         }
-        if (turnStep == 2) {
+        if (turnStep == 2 || turnStep == 5) {
             playerPositions[turn % players] += diceRoll;
             for (int forgetPosition : forgetPositions) {
                 if (playerPositions[turn % players] == forgetPosition) {
@@ -212,22 +206,76 @@ int main() {
                     turn--;
                 }
             }
-            if (playerPositions[turn % players] == 32) {
+            if (playerPositions[turn % players] == 32 && turnStep != 5 && playerWait[turn % players] < 0) {
                 playerWait[turn % players] += 2;
             }
-
+            if (turnStep != 5) {
+                for (int i = 0; i < 2; i++) {
+                    for (int j = 0; j < 3; j++) {
+                        if (playerPositions[turn % players] == thingPositions[i][j]) {
+                            turnStep++;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (playerPositions[turn % players] > 64) {
+                for (int i = 0; i < 16; i++) {
+                    if (basket[turn % players][i]) {
+                        playerPositions[turn % players] -= 64;
+                    }
+                }
+            }
+            if (playerPositions[turn % players] > 64) {
+                infoline = "player " + to_string(turn % players + 1) + " wins";
+                drawboard(turn % players, turnStep);
+                cout << "\n\n\n\n\n\n\n\n";
+                return 1;
+            }
             turnStep++;
         }
-        if (turnStep > 2) {
+        while (turnStep == 4) {
+            int k = -1;
+            for (int i = 0; i < 2; i++) {
+                for (int j = 0; j < 3; j++) {
+                    if (playerPositions[turn % players] == thingPositions[i][j]) {
+                        k = i;
+                        break;
+                    }
+                }
+            }
+            infoline = "Enter the new position for player " + to_string(turn % players + 1) + " (";
+            for (int thingPos : thingPositions[k]) {
+                if (thingPos > 0) {
+                    infoline += to_string(thingPos) += ",";
+                }
+            }
+            infoline.pop_back();
+            infoline += ") ";
+            drawboard(turn % players, turnStep);
+            cout << "\033[s\n\n\n\n\n\n\n\n";
+            int newPos;
+            cin >> newPos;
+            cout << "\033[u";
+            infoline = "";
+            if (find(thingPositions[k], thingPositions[k] + 3, newPos) != thingPositions[k] + 3) {
+                playerPositions[turn % players] = newPos;
+                diceRoll = 0;
+                turnStep++;
+            }
+        }
+        if (turnStep > 5 || turnStep == 3) {
             turnStep = 0;
             while (isInputAvailable()) {
                 string input;
                 getline(cin, input);
             }
             turn++;
-            if (playerWait[turn % players] > 0) {
+            if (playerWait[turn % players] >= 0) {
                 playerWait[turn % players]--;
-                turn++;
+                if (playerWait[turn % players] = 0) {
+                    turn++;
+                }
             }
         }
         auto end = chrono::high_resolution_clock::now();
