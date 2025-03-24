@@ -273,7 +273,7 @@ int main() {
             turn++;
             if (playerWait[turn % players] >= 0) {
                 playerWait[turn % players]--;
-                if (playerWait[turn % players] = 0) {
+                if (playerWait[turn % players] == 0) {
                     turn++;
                 }
             }
