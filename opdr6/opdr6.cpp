@@ -7,6 +7,7 @@ https://en.wikipedia.org/wiki/ANSI_escape_code
 #include <chrono>
 #include <thread>
 using namespace std;
+
 const string reset = "\033[0m";
 const string playercolors[4] = { "\033[31m","\033[32m","\033[33m","\033[34m" };
 const string items[16] = { "cheese","cucumber","salad","melon","bread","milk","chips","cookies","pork","ham","tomatoes","potatoes","carrots","pizza","banana","paprika" };
@@ -21,6 +22,7 @@ int playerWait[4] = { 0 };
 int players;
 int turn = 0;
 int turnStep = 0;
+bool moveReverse = false;
 string infoline = "";
 
 string setLength(string str, int length) {
@@ -108,13 +110,14 @@ void drawboard(int turn, int turnStep) {
         }
         // draw the dice
         // if (turnStep == 0 || turnStep == 1) {
+        int dR = abs(diceRoll);
         board += playercolors[turn];
         if (i < 2) {
-            board += block(diceRoll > 1) + string(10, ' ') + block(diceRoll > 3);
+            board += block(dR > 1) + string(10, ' ') + block(dR > 3);
         } else if (i > 2 && i < 5) {
-            board += block(diceRoll > 5) + string(3, ' ') + block(diceRoll & 1) + string(3, ' ') + block(diceRoll > 5);
+            board += block(dR > 5) + string(3, ' ') + block(dR & 1) + string(3, ' ') + block(dR > 5);
         } else if (i > 5) {
-            board += block(diceRoll > 3) + string(10, ' ') + block(diceRoll > 1);
+            board += block(dR > 3) + string(10, ' ') + block(dR > 1);
         } else {
             board += string(18, ' ');
         }
@@ -165,22 +168,29 @@ int main() {
         cout << "Invalid number of players. Please enter a number between 2 and 4." << endl;
         return 1;
     }
+    // cout <<
+    cout << "\033[2A"; // remove those lines again
+    cout << "\033[0J";
     while (true) {
         auto start = chrono::high_resolution_clock::now();
         drawboard(turn % players, turnStep);
         if (isInputAvailable()) {
             string input;
             getline(cin, input);
+            moveReverse = input == "r";
             turnStep++;
         }
         if (turnStep == 1) {
-            diceRoll = rand() % 6 + 1;
+            diceRoll = (rand() % 6 + 1) * (moveReverse? -1:1);
             drawboard(turn % players, turnStep);
             sleep(1);
             turnStep++;
         }
         if (turnStep == 2 || turnStep == 5) {
             playerPositions[turn % players] += diceRoll;
+            if (playerPositions[turn % players] < 0) {
+                playerPositions[turn % players] = 0;
+            }
             for (int forgetPosition : forgetPositions) {
                 if (playerPositions[turn % players] == forgetPosition) {
                     playerPositions[turn % players] -= 4;
