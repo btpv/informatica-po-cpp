@@ -4,4 +4,4 @@
 - [x] opdr 4 | lenny
 - [x] opdr 5 | simon
 - [ ] opdr 6 | borro
-- [ ] opdr 7 | 
+- [x] opdr 7 | Simon
