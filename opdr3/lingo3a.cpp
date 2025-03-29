@@ -47,7 +47,7 @@ int main() {
   ifstream file4("lingo.in");
   string guess;
   getline(file4, guess);
-  for (char &letter : guess) {
+  for (char& letter : guess) {
     letter = toupper(letter);
   }
 

@@ -181,7 +181,7 @@ int main() {
             turnStep++;
         }
         if (turnStep == 1) {
-            diceRoll = (rand() % 6 + 1) * (moveReverse? -1:1);
+            diceRoll = (rand() % 6 + 1) * (moveReverse ? -1 : 1);
             drawboard(turn % players, turnStep);
             sleep(1);
             turnStep++;

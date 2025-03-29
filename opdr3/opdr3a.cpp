@@ -30,8 +30,8 @@ int main() {
   char firstLetter = answer[0];
   string word;
   vector<string> words;
-  while(getline(file2, word)) {
-    if(word[0] == firstLetter) {
+  while (getline(file2, word)) {
+    if (word[0] == firstLetter) {
       words.push_back(word);
     }
   }
@@ -39,7 +39,7 @@ int main() {
 
   // the woordenlijst that the player can use to see which words are possible
   ofstream file3("woordenlijst.dat");
-  for(string word : words) {
+  for (string word : words) {
     file3 << word << endl;
   }
 

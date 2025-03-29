@@ -78,9 +78,9 @@ int main() {
   }
   file4 << "klaar" << endl;
 
- ifstream file5("lingo3d.uit");
+  ifstream file5("lingo3d.uit");
   string output;
-  while(getline(file5, output)) {
+  while (getline(file5, output)) {
     cout << output << endl;
   }
 

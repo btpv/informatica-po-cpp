@@ -86,7 +86,7 @@ int main() {
     }
     for (int i = 0; i < correct_letter_wrong_position.size(); i++) {
       if (word[correct_letter_wrong_position_index[i]] ==
-          correct_letter_wrong_position[i]) {
+        correct_letter_wrong_position[i]) {
         wrong_letter = true;
         break;
       }
