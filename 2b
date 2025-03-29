@@ -1,0 +1,72 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <unordered_set>
+
+// Functie om te controleren of een woord een geldig Nederlands woord is
+bool isGeldigWoord(const std::string& woord, const std::unordered_set<std::string>& woordenlijst) {
+    return woordenlijst.find(woord) != woordenlijst.end();
+}
+
+// Functie om alle permutaties van het invoerwoord te genereren
+void genereerWoorden(const std::string& invoerwoord, const std::unordered_set<std::string>& woordenlijst, std::ofstream& uitvoerbestand) {
+    std::vector<std::string> geldigeWoorden;
+    std::string woord = invoerwoord;
+
+    // Sorteer het invoerwoord voor lexicografische volgorde
+    std::sort(woord.begin(), woord.end());
+
+    do {
+        // Controleer of het gegenereerde woord een geldig woord is
+        if (isGeldigWoord(woord, woordenlijst)) {
+            geldigeWoorden.push_back(woord);
+        }
+    } while (std::next_permutation(woord.begin(), woord.end())); // Genereer volgende permutatie
+
+    // Sorteer de geldige woorden en schrijf ze naar het uitvoerbestand
+    std::sort(geldigeWoorden.begin(), geldigeWoorden.end());
+    for (const auto& geldigWoord : geldigeWoorden) {
+        uitvoerbestand << geldigWoord << std::endl;
+    }
+
+    // Voeg 'stop' toe als laatste regel
+    uitvoerbestand << "stop" << std::endl;
+}
+
+int main() {
+    std::ifstream invoerbestand("WOORD.IN");
+    std::ofstream uitvoerbestand("PUZZEL2B<EIGENNAAM>.UIT");
+
+    if (!invoerbestand) {
+        std::cerr << "Fout bij het openen van invoerbestand!" << std::endl;
+        return 1;
+    }
+
+    if (!uitvoerbestand) {
+        std::cerr << "Fout bij het openen van uitvoerbestand!" << std::endl;
+        return 1;
+    }
+
+    std::unordered_set<std::string> woordenlijst;
+
+    // Laad een woordenlijst (dit is een voorbeeld, je moet deze vullen met daadwerkelijke woorden)
+    std::ifstream woordenlijstBestand("woordenlijst.txt");
+    std::string woord;
+    while (woordenlijstBestand >> woord) {
+        woordenlijst.insert(woord);
+    }
+
+    // Lees het invoerwoord
+    std::string invoerwoord;
+    invoerbestand >> invoerwoord;
+
+    // Genereer en schrijf geldige woorden naar het uitvoerbestand
+    genereerWoorden(invoerwoord, woordenlijst, uitvoerbestand);
+
+    return 0;
+}
+
+
+
