@@ -76,8 +76,8 @@ map<string, map<string, string>> vragen = {
 }}
 };
 
-vector<string> eerste_vraag = {"Welke taal wil je?", "What language do you want?"};
-vector<string> talen = {"nl", "en"};
+vector<string> eerste_vraag = { "Welke taal wil je?", "What language do you want?" };
+vector<string> talen = { "nl", "en" };
 map<string, map<string, string>> adviezen = {
   {"nl", {
     {"A", "De sportende allemansvriend. Jij kunt fantastisch sporten in een team. ledere andere speler kan best goed met je vinden in het sportveld. Dat kan aan twee dingen liggen. Of je bent verschrikkelijk aardig - je speelt altijd over, zelfs naar de grootste prutsers uit je team. Of je bent ontzettend goed - als jij de bal hebt, dan valt er altijd een doelpunt. In leder geval: je past uitstekend in bijna elk sportteam. Sporten: voetbal, hockey, basketbal, handbal. Jij wordt net zo goed als: Ruud van Nistelrooy."},
@@ -109,7 +109,7 @@ map<string, map<string, string>> adviezen = {
 
 void printq(string l, string q) {
   cout << vragen[l][q] << " (" << antwoorden[l]["c"] << "/"
-       << antwoorden[l]["d"] << "): " << endl;
+    << antwoorden[l]["d"] << "): " << endl;
 }
 
 void printa(string l, string a) { cout << adviezen[l][a] << endl; }
