@@ -1,5 +1,5 @@
 - [x] opdr 1 | borro
-- [ ] opdr 2 | Lenny
+- [x] opdr 2 | Lenny
 - [x] opdr 3 | simon
 - [x] opdr 4 | lenny
 - [x] opdr 5 | simon

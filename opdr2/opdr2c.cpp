@@ -22,7 +22,7 @@ int main() {
     ifstream wordfile("woordenlijst.txt");
     vector<string> words;
     string word;
-    
+
     while (wordfile >> word) {
         words.push_back(word);
     }
@@ -31,9 +31,10 @@ int main() {
     ifstream infile("WOORD.IN");
     string start_word;
     infile >> start_word;
-    
+
+
     // Vectoren voor vorige en huidige woorden
-    vector<string> prevwords = {start_word};
+    vector<string> prevwords = { start_word };
     vector<string> currentwords;
     vector<vector<string>> trapeziums;
 
@@ -41,7 +42,7 @@ int main() {
     while (!prevwords.empty()) {
         currentwords.clear();
         vector<string> trapezium;
-        
+
         for (const string& w : words) {
             for (const string& prev : prevwords) {
                 if (count_matching_letters(w, prev) == w.size() - 1) {
@@ -50,11 +51,11 @@ int main() {
                 }
             }
         }
-        
+
         if (!trapezium.empty()) {
             trapeziums.push_back(trapezium);
         }
-        
+
         prevwords = currentwords;
     }
 
