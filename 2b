@@ -37,7 +37,7 @@ void genereerWoorden(const std::string& invoerwoord, const std::unordered_set<st
 
 int main() {
     std::ifstream invoerbestand("WOORD.IN");
-    std::ofstream uitvoerbestand("PUZZEL2B<EIGENNAAM>.UIT");
+    std::ofstream uitvoerbestand("PUZZEL2B");
 
     if (!invoerbestand) {
         std::cerr << "Fout bij het openen van invoerbestand!" << std::endl;
